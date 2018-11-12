@@ -1,0 +1,21 @@
+CONFIG_NAME: 'stage'
+DATASET_NAME: 'coco'
+EMBEDDING_TYPE: 'cnn-rnn'
+DATA_DIR: '../data/coco'
+GPU_ID: '0,1,2,3'
+WORKERS: 4  # 4
+TREE:
+    BRANCH_NUM: 3
+TEST:
+    B_EXAMPLE: True 
+TRAIN:
+    FLAG: False
+    NET_G: '../models/coco/netG_4310.pth'
+    BATCH_SIZE: 24
+GAN:
+    EMBEDDING_DIM: 128
+    DF_DIM: 64
+    GF_DIM: 64
+    Z_DIM: 100
+    R_NUM: 2
+    B_CONDITION: True
