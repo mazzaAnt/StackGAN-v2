@@ -36,6 +36,17 @@ In addition, please add the project folder to PYTHONPATH and `pip install` the f
 4. Download [LSUN](https://github.com/fyu/lsun) dataset and save the images to `data/lsun`
 
 
+COCO
+- 'Uses the conditiona GANtrainer in trainer.py'
+- 'Uses the TextDataset class in datasets.py'
+- 'Uses the preprocessed data from https://github.com/taoxugit/AttnGAN  [coco](https://drive.google.com/open?id=1rSnbIGNDGZeHlsUlLdahj0RJ9oo6lgH9) '
+- 'Uses embeddings from https://github.com/ypxie/HDGan [embeddingsCOCO](https://www.dropbox.com/sh/aax9prnnb17kpgq/AADiUTJL9wWnLCgPHDEilJHwa?dl=0)'
+- 'Uses the 2014 training and validation set from [MS-COCO](http://cocodataset.org/#download)'
+
+
+
+
+
 
 
 **Training**
