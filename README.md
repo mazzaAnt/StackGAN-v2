@@ -42,7 +42,7 @@ COCO
 - Uses the preprocessed data from https://github.com/taoxugit/AttnGAN  [coco](https://drive.google.com/open?id=1rSnbIGNDGZeHlsUlLdahj0RJ9oo6lgH9) follow instructions on where to put data.
 - Uses embeddings from https://github.com/ypxie/HDGan [embeddingsCOCO](https://www.dropbox.com/sh/aax9prnnb17kpgq/AADiUTJL9wWnLCgPHDEilJHwa?dl=0) put into repspective folders.
 - Uses the 2014 training and validation set from [MS-COCO](http://cocodataset.org/#download)
-- Uses coco_train.yml in the code/cfg
+- Uses coco_train.yml in the code/cfg for training, uses eval_coco.yml for test
 - Uses inception score at [Inception Score](https://github.com/openai/improved-gan/tree/master/inception_score)
 
 
