@@ -43,6 +43,7 @@ COCO
 - Uses embeddings from https://github.com/ypxie/HDGan [embeddingsCOCO](https://www.dropbox.com/sh/aax9prnnb17kpgq/AADiUTJL9wWnLCgPHDEilJHwa?dl=0) put into repspective folders.
 - Uses the 2014 training and validation set from [MS-COCO](http://cocodataset.org/#download)
 - Uses coco_train.yml in the code/cfg
+- Uses inception score at [Inception Score](https://github.com/openai/improved-gan/tree/master/inception_score)
 
 
 
