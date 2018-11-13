@@ -2,8 +2,8 @@ CONFIG_NAME: '3stages_color'
 
 DATASET_NAME: 'dog'
 DATA_DIR: '../data/imagenet'
-GPU_ID: '3'
-WORKERS: 4  # 4
+GPU_ID: '0,1,2,3'
+WORKERS: 1  # 4
 
 
 TREE:
@@ -14,7 +14,7 @@ TRAIN:
     FLAG: True
     NET_G: ''  # '../output/dog_3stages_color/Model/netG_50000.pth'
     NET_D: ''  # '../output/dog_3stages_color/Model/netD'
-    BATCH_SIZE: 24
+    BATCH_SIZE: 12
     MAX_EPOCH: 100
     SNAPSHOT_INTERVAL: 2000
     DISCRIMINATOR_LR: 0.0002

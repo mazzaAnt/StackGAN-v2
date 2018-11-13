@@ -2,7 +2,7 @@ CONFIG_NAME: '3stages_color'
 
 DATASET_NAME: 'church_outdoor'  # cat, dog, bedroom, church_outdoor
 DATA_DIR: '../data/lsun'  # imagenet, lsun
-GPU_ID: '3'
+GPU_ID: '0,1,2,3'
 WORKERS: 4  # 4
 
 
