@@ -282,7 +282,7 @@ class GANTrainer(object):
         errD_fake = criterion(fake_logits[0], fake_labels)
         #
         errD = errD_real + errD_fake
-        errD.backward()
+        errD.backward(retain_graph=True)
         # update parameters
         optD.step()
         # log
@@ -339,7 +339,7 @@ class GANTrainer(object):
                     sum_cov = summary.scalar('G_like_cov1', like_cov1.data[0])
                     self.summary_writer.add_summary(sum_cov, count)
 
-        errG_total.backward()
+        errG_total.backward(retain_graph=True)
         self.optimizerG.step()
         return errG_total
 
@@ -599,7 +599,7 @@ class condGANTrainer(object):
         else:
             errD = errD_real + 0.5 * (errD_wrong + errD_fake)
         # backward
-        errD.backward()
+        errD.backward(retain_graph=True)
         # update parameters
         optD.step()
         # log
@@ -658,7 +658,7 @@ class condGANTrainer(object):
 
         kl_loss = KL_loss(mu, logvar) * cfg.TRAIN.COEFF.KL
         errG_total = errG_total + kl_loss
-        errG_total.backward()
+        errG_total.backward(retain_graph=True)
         self.optimizerG.step()
         return kl_loss, errG_total
 
@@ -769,6 +769,12 @@ class condGANTrainer(object):
                         self.summary_writer.add_summary(m_nlpp, count)
                         #
                         predictions = []
+
+                errG_total.backward()
+                self.optimizerG.step()
+                errD_total.backward()
+                for optD in self.optimizersD:
+                    optD.step()
 
             end_t = time.time()
             print('''[%d/%d][%d]
