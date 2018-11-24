@@ -21,6 +21,7 @@ from tensorboard import FileWriter
 
 from model import G_NET, D_NET64, D_NET128, D_NET256, D_NET512, D_NET1024, INCEPTION_V3
 
+import train as show_attend_tell
 
 
 # ################## Shared functions ###################
@@ -228,6 +229,7 @@ def save_img_results(imgs_tcpu, fake_imgs, num_imgs,
 # ################## For uncondional tasks ######################### #
 class GANTrainer(object):
     def __init__(self, output_dir, data_loader, imsize):
+        print ('unconditional')
         if cfg.TRAIN.FLAG:
             self.model_dir = os.path.join(output_dir, 'Model')
             self.image_dir = os.path.join(output_dir, 'Image')
@@ -522,6 +524,7 @@ class GANTrainer(object):
 # ################# Text to image task############################ #
 class condGANTrainer(object):
     def __init__(self, output_dir, data_loader, imsize):
+        print ('conditional')
         if cfg.TRAIN.FLAG:
             self.model_dir = os.path.join(output_dir, 'Model')
             self.image_dir = os.path.join(output_dir, 'Image')

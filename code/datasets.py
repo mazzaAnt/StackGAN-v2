@@ -227,7 +227,7 @@ class TextDataset(data.Dataset):
         #
         filename_bbox = {img_file[:-4]: [] for img_file in filenames}
         numImgs = len(filenames)
-        for i in xrange(0, numImgs):
+        for i in range(0, numImgs):
             # bbox = [x-left, y-top, width, height]
             bbox = df_bounding_boxes.iloc[i][1:].tolist()
 
@@ -240,7 +240,7 @@ class TextDataset(data.Dataset):
         def load_captions(caption_name):  # self,
             cap_path = caption_name
             with open(cap_path, "r") as f:
-                captions = f.read().decode('utf8').split('\n')
+                captions = f.read().split('\n')
             captions = [cap.replace("\ufffd\ufffd", " ")
                         for cap in captions if len(cap) > 0]
             return captions
