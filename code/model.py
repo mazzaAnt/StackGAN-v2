@@ -244,18 +244,12 @@ class G_NET(nn.Module):
         if cfg.TREE.BRANCH_NUM > 0:
             self.h_net1 = INIT_STAGE_G(self.gf_dim * 16)
             self.img_net1 = GET_IMAGE_G(self.gf_dim)
-        if cfg.TREE.BRANCH_NUM > 1:
-            self.h_net2 = NEXT_STAGE_G(self.gf_dim)
-            self.img_net2 = GET_IMAGE_G(self.gf_dim // 2)
-        if cfg.TREE.BRANCH_NUM > 2:
-            self.h_net3 = NEXT_STAGE_G(self.gf_dim // 2)
-            self.img_net3 = GET_IMAGE_G(self.gf_dim // 4)
-        if cfg.TREE.BRANCH_NUM > 3: # Recommended structure (mainly limited by GPU memory), and not test yet
-            self.h_net4 = NEXT_STAGE_G(self.gf_dim // 4, num_residual=1)
-            self.img_net4 = GET_IMAGE_G(self.gf_dim // 8)
-        if cfg.TREE.BRANCH_NUM > 4:
-            self.h_net4 = NEXT_STAGE_G(self.gf_dim // 8, num_residual=1)
-            self.img_net4 = GET_IMAGE_G(self.gf_dim // 16)
+        # if cfg.TREE.BRANCH_NUM > 1:
+            # self.h_net2 = NEXT_STAGE_G(self.gf_dim)
+            # self.img_net2 = GET_IMAGE_G(self.gf_dim // 2)
+        # if cfg.TREE.BRANCH_NUM > 2:
+            # self.h_net3 = NEXT_STAGE_G(self.gf_dim // 2)
+            # self.img_net3 = GET_IMAGE_G(self.gf_dim // 4)
 
     def forward(self, z_code, text_embedding=None):
         if cfg.GAN.B_CONDITION and text_embedding is not None:
@@ -267,18 +261,10 @@ class G_NET(nn.Module):
             h_code1 = self.h_net1(z_code, c_code)
             fake_img1 = self.img_net1(h_code1)
             fake_imgs.append(fake_img1)
-        if cfg.TREE.BRANCH_NUM > 1:
-            h_code2 = self.h_net2(h_code1, c_code)
-            fake_img2 = self.img_net2(h_code2)
-            fake_imgs.append(fake_img2)
-        if cfg.TREE.BRANCH_NUM > 2:
-            h_code3 = self.h_net3(h_code2, c_code)
-            fake_img3 = self.img_net3(h_code3)
-            fake_imgs.append(fake_img3)
-        if cfg.TREE.BRANCH_NUM > 3:
-            h_code4 = self.h_net4(h_code3, c_code)
-            fake_img4 = self.img_net4(h_code4)
-            fake_imgs.append(fake_img4)
+        # if cfg.TREE.BRANCH_NUM > 1:
+            # h_code2 = self.h_net2(h_code1, c_code)
+            # fake_img2 = self.img_net2(h_code2)
+            # fake_imgs.append(fake_img2)
 
         return fake_imgs, mu, logvar
 

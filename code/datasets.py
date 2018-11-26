@@ -57,7 +57,7 @@ def get_imgs(img_path, imsize, bbox=None,
     ret = []
     for i in range(cfg.TREE.BRANCH_NUM):
         if i < (cfg.TREE.BRANCH_NUM - 1):
-            re_img = transforms.Scale(imsize[i])(img)
+            re_img = transforms.Resize(imsize[i])(img)
         else:
             re_img = img
         ret.append(normalize(re_img))
@@ -130,56 +130,6 @@ class ImageFolder(data.Dataset):
         return len(self.imgs)
 
 
-class LSUNClass(data.Dataset):
-    def __init__(self, db_path, base_size=64,
-                 transform=None, target_transform=None):
-        import lmdb
-        self.db_path = db_path
-        self.env = lmdb.open(db_path, max_readers=1, readonly=True, lock=False,
-                             readahead=False, meminit=False)
-        with self.env.begin(write=False) as txn:
-            self.length = txn.stat()['entries']
-            print('length: ', self.length)
-        cache_file = db_path + '/cache'
-        if os.path.isfile(cache_file):
-            self.keys = pickle.load(open(cache_file, "rb"))
-            print('Load:', cache_file, 'keys: ', len(self.keys))
-        else:
-            with self.env.begin(write=False) as txn:
-                self.keys = [key for key, _ in txn.cursor()]
-            pickle.dump(self.keys, open(cache_file, "wb"))
-
-        self.imsize = []
-        for i in range(cfg.TREE.BRANCH_NUM):
-            self.imsize.append(base_size)
-            base_size = base_size * 2
-
-        self.transform = transform
-        self.target_transform = target_transform
-        self.norm = transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
-
-    def __getitem__(self, index):
-        env = self.env
-        with env.begin(write=False) as txn:
-            imgbuf = txn.get(self.keys[index])
-
-        buf = six.BytesIO()
-        buf.write(imgbuf)
-        buf.seek(0)
-        imgs = get_imgs(buf, self.imsize,
-                        transform=self.transform,
-                        normalize=self.norm)
-        return imgs
-
-    def __len__(self):
-        return self.length
-
-    def __repr__(self):
-        return self.__class__.__name__ + ' (' + self.db_path + ')'
-
-
 class TextDataset(data.Dataset):
     def __init__(self, data_dir, split='train', embedding_type='cnn-rnn',
                  base_size=64, transform=None, target_transform=None):
@@ -227,7 +177,7 @@ class TextDataset(data.Dataset):
         #
         filename_bbox = {img_file[:-4]: [] for img_file in filenames}
         numImgs = len(filenames)
-        for i in xrange(0, numImgs):
+        for i in range(0, numImgs):
             # bbox = [x-left, y-top, width, height]
             bbox = df_bounding_boxes.iloc[i][1:].tolist()
 
@@ -240,7 +190,7 @@ class TextDataset(data.Dataset):
         def load_captions(caption_name):  # self,
             cap_path = caption_name
             with open(cap_path, "r") as f:
-                captions = f.read().decode('utf8').split('\n')
+                captions = f.read().split('\n')
             captions = [cap.replace("\ufffd\ufffd", " ")
                         for cap in captions if len(cap) > 0]
             return captions
@@ -248,6 +198,7 @@ class TextDataset(data.Dataset):
         caption_dict = {}
         for key in self.filenames:
             caption_name = '%s/text/%s.txt' % (self.data_dir, key)
+            # caption_name = '%s/text/%s.txt' % (self.data_dir, key[:-4].decode("utf-8") )
             captions = load_captions(caption_name)
             caption_dict[key] = captions
         return caption_dict
@@ -261,7 +212,8 @@ class TextDataset(data.Dataset):
             embedding_filename = '/skip-thought-embeddings.pickle'
 
         with open(data_dir + embedding_filename, 'rb') as f:
-            embeddings = pickle.load(f)
+            # embeddings = pickle.load(f)
+            embeddings = pickle.load(f, encoding='latin1')
             embeddings = np.array(embeddings)
             # embedding_shape = [embeddings.shape[-1]]
             print('embeddings: ', embeddings.shape)
@@ -270,7 +222,7 @@ class TextDataset(data.Dataset):
     def load_class_id(self, data_dir, total_num):
         if os.path.isfile(data_dir + '/class_info.pickle'):
             with open(data_dir + '/class_info.pickle', 'rb') as f:
-                class_id = pickle.load(f)
+                class_id = pickle.load(f, encoding='latin1')
         else:
             class_id = np.arange(total_num)
         return class_id
@@ -278,7 +230,7 @@ class TextDataset(data.Dataset):
     def load_filenames(self, data_dir):
         filepath = os.path.join(data_dir, 'filenames.pickle')
         with open(filepath, 'rb') as f:
-            filenames = pickle.load(f)
+            filenames = pickle.load(f, encoding='latin1')
         print('Load filenames from: %s (%d)' % (filepath, len(filenames)))
         return filenames
 
