@@ -131,6 +131,7 @@ if __name__ == "__main__":
                               transform=image_transform)
     assert dataset
     num_gpu = len(cfg.GPU_ID.split(','))
+    print ('... creating dataloader')
     dataloader = torch.utils.data.DataLoader(
         dataset, batch_size=cfg.TRAIN.BATCH_SIZE * num_gpu,
         drop_last=True, shuffle=bshuffle, num_workers=int(cfg.WORKERS))
@@ -141,6 +142,7 @@ if __name__ == "__main__":
     # else:
         # from trainer import condGANTrainer as trainer
     from trainer import condGANTrainer as trainer
+    print ('... starting training')
     algo = trainer(output_dir, dataloader, imsize)
 
     start_t = time.time()

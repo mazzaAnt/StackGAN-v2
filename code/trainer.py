@@ -232,7 +232,9 @@ def save_img_results(imgs_tcpu, fake_imgs, num_imgs,
 # ################# Text to image task############################ #
 class condGANTrainer(object):
     def __init__(self, output_dir, data_loader, imsize):
+        print ('condGANTrainer')
         if cfg.TRAIN.FLAG:
+            print ('...training')
             self.model_dir = os.path.join(output_dir, 'Model')
             self.image_dir = os.path.join(output_dir, 'Image')
             self.log_dir = os.path.join(output_dir, 'Log')
@@ -413,10 +415,13 @@ class condGANTrainer(object):
         predictions = []
         count = start_count
         start_epoch = start_count // (self.num_batches)
+        zipped = zip(self.data_loader, train_loader)
+        total = len(self.data_loader)
         for epoch in range(start_epoch, self.max_epoch):
             start_t = time.time()
 
-            for step, data in enumerate(zip(self.data_loader, train_loader), 0):
+            for step, data in enumerate(zipped, 0):
+                print ('step:',step, '/', total)
                 data_1 = data[0]
                 _, caps, caplens = data[1]
                 caps.long().cuda()
@@ -426,20 +431,23 @@ class condGANTrainer(object):
                 #######################################################
                 # (0) Prepare training data
                 ######################################################
+                if cfg.DEBUG: print (step, '... prepare training data')
                 self.imgs_tcpu, self.real_imgs, self.wrong_imgs, \
                     self.txt_embedding = self.prepare_data(data)
 
                 #######################################################
                 # (1) Generate fake images
                 ######################################################
+                if cfg.DEBUG: print (step, '... generate fake images')
                 noise.data.normal_(0, 1)
                 self.fake_imgs, self.mu, self.logvar = \
                     self.netG(noise, self.txt_embedding)
                 # self.fake_imgs[0].shape = [12, 3, 64, 64]; batch_size = 12
 
                 #######################################################
-                # (*) Forware fake_imgs to Show, Attend and Tell
+                # (*) Forward fake_imgs to Show, Attend and Tell
                 ######################################################
+                if cfg.DEBUG: print (step, '... forward fake images to show,attend, and tell')
                 from SATmodels import Encoder, DecoderWithAttention
                 from torch.nn.utils.rnn import pack_padded_sequence
 
@@ -477,6 +485,7 @@ class condGANTrainer(object):
                 #######################################################
                 # (2) Update D network
                 ######################################################
+                if cfg.DEBUG: print (step, '... update D network')
                 errD_total = 0
                 # for i in range(self.num_Ds):
                 errD = self.train_Dnet(0, count)
@@ -485,6 +494,7 @@ class condGANTrainer(object):
                 #######################################################
                 # (3) Update G network: maximize log(D(G(z)))
                 ######################################################
+                if cfg.DEBUG: print (step, '... update G network: maximize log(D(G(z))')
                 kl_loss, errG_total = self.train_Gnet(count)
 
                 # Combine with G and SAT first
@@ -499,6 +509,7 @@ class condGANTrainer(object):
                 #######################################################
                 # (*) Update SAT network:
                 ######################################################
+                if cfg.DEBUG: print (step, '... update sat network')
                 # Update weights
                 decoder_optimizer.step()
                 if encoder_optimizer is not None:
@@ -520,6 +531,7 @@ class condGANTrainer(object):
                 count += 1
 
                 if count % cfg.TRAIN.SNAPSHOT_INTERVAL == 0:
+                    if cfg.DEBUG: print (step, '... snapshot')
                     save_model(self.netG, avg_param_G, self.netsD, count, self.model_dir)
                     # Save images
                     backup_para = copy_G_params(self.netG)

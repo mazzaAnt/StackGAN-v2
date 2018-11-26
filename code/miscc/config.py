@@ -14,7 +14,7 @@ __C.DATASET_NAME = 'birds'
 __C.EMBEDDING_TYPE = 'cnn-rnn'
 __C.CONFIG_NAME = ''
 __C.DATA_DIR = ''
-
+__C.DEBUG = False
 __C.GPU_ID = '0'
 __C.CUDA = True
 
