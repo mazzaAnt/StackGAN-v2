@@ -444,7 +444,7 @@ class condGANTrainer(object):
                 self.fake_imgs, self.mu, self.logvar = \
                     self.netG(noise, self.txt_embedding)
                 
-                assert len(self.fake_imgs) == self.num_Ds
+                # assert len(self.fake_imgs) == self.num_Ds
                 # self.fake_imgs[0].shape = [12, 3, 64, 64]; batch_size = 12
 
                 #######################################################
@@ -490,8 +490,8 @@ class condGANTrainer(object):
                 ######################################################
                 if cfg.DEBUG: print (step, '... update D network')
                 errD_total = 0
-                print (self.num_Ds)
-                print (len(self.fake_imgs))
+                # print (self.num_Ds)
+                # print (len(self.fake_imgs))
                 for i in range(self.num_Ds):
                     errD = self.train_Dnet(i, count)
                     errD_total += errD
