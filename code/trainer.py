@@ -233,7 +233,7 @@ def save_img_results(imgs_tcpu, fake_imgs, num_imgs,
 # ################# Text to image task############################ #
 class condGANTrainer(object):
     def __init__(self, output_dir, data_loader, imsize):
-        print ('condGANTrainer')
+        print ('... creating condGANTrainer')
         if cfg.TRAIN.FLAG:
             print ('...training')
             self.model_dir = os.path.join(output_dir, 'Model')
@@ -460,20 +460,19 @@ class condGANTrainer(object):
                 with open(word_map_file, 'r') as j:
                     word_map = json.load(j)
 
-                decoder = DecoderWithAttention(attention_dim=512,
-                                               embed_dim=512,
-                                               decoder_dim=512,
-                                               vocab_size=len(word_map),
-                                               dropout=0.5).cuda()
-                decoder_optimizer = torch.optim.Adam(params=filter(lambda p: p.requires_grad, decoder.parameters()),
-                                                     lr=4e-4)
-                encoder = Encoder().cuda()
-                encoder.fine_tune(fine_tune_encoder)
-                encoder_optimizer = torch.optim.Adam(params=filter(lambda p: p.requires_grad, encoder.parameters()),
-                                                     lr=1e-4) if fine_tune_encoder else None
-
                 SATloss = 0.
                 for i in range(len(self.fake_imgs)):
+                    decoder = DecoderWithAttention(attention_dim=512,
+                                                   embed_dim=512,
+                                                   decoder_dim=512,
+                                                   vocab_size=len(word_map),
+                                                   dropout=0.5).cuda()
+                    decoder_optimizer = torch.optim.Adam(params=filter(lambda p: p.requires_grad, decoder.parameters()),
+                                                         lr=4e-4)
+                    encoder = Encoder().cuda()
+                    encoder.fine_tune(fine_tune_encoder)
+                    encoder_optimizer = torch.optim.Adam(params=filter(lambda p: p.requires_grad, encoder.parameters()),
+                                                         lr=1e-4) if fine_tune_encoder else None
                     imgs = encoder(self.fake_imgs[i].cuda())
                     scores, caps_sorted, decode_lengths, alphas, sort_ind = decoder(imgs, caps, caplens)
                     targets = caps_sorted[:, 1:]
