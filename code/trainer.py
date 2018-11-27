@@ -416,13 +416,12 @@ class condGANTrainer(object):
         predictions = []
         count = start_count
         start_epoch = start_count // (self.num_batches)
-        zipped = zip(self.data_loader, train_loader)
-        total = len(self.data_loader)
+
         for epoch in range(start_epoch, self.max_epoch):
             start_t = time.time()
 
-            for step, data in enumerate(zipped, 0):
-                print ('step:',step, '/', total)
+            for step, data in enumerate(zip(self.data_loader, train_loader), 0):
+                print ('step:',step, '/', self.num_batches)
                 data_1 = data[0]
                 _, caps, caplens = data[1]
                 caps.long().cuda()
