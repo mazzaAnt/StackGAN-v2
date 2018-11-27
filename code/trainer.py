@@ -116,14 +116,14 @@ def load_network(gpus):
     netsD = []
     if cfg.TREE.BRANCH_NUM > 0:
         netsD.append(D_NET64())
-    # if cfg.TREE.BRANCH_NUM > 1:
-        # netsD.append(D_NET128())
-    # if cfg.TREE.BRANCH_NUM > 2:
-        # netsD.append(D_NET256())
-    # if cfg.TREE.BRANCH_NUM > 3:
-        # netsD.append(D_NET512())
-    # if cfg.TREE.BRANCH_NUM > 4:
-        # netsD.append(D_NET1024())
+    if cfg.TREE.BRANCH_NUM > 1:
+        netsD.append(D_NET128())
+    if cfg.TREE.BRANCH_NUM > 2:
+        netsD.append(D_NET256())
+    if cfg.TREE.BRANCH_NUM > 3:
+        netsD.append(D_NET512())
+    if cfg.TREE.BRANCH_NUM > 4:
+        netsD.append(D_NET1024())
     # TODO: if cfg.TREE.BRANCH_NUM > 5:
 
     for i in range(len(netsD)):
