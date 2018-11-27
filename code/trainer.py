@@ -487,9 +487,9 @@ class condGANTrainer(object):
                 ######################################################
                 if cfg.DEBUG: print (step, '... update D network')
                 errD_total = 0
-                # for i in range(self.num_Ds):
-                errD = self.train_Dnet(0, count)
-                errD_total += errD
+                for i in range(self.num_Ds):
+                    errD = self.train_Dnet(i, count)
+                    errD_total += errD
 
                 #######################################################
                 # (3) Update G network: maximize log(D(G(z)))
@@ -514,7 +514,6 @@ class condGANTrainer(object):
                 decoder_optimizer.step()
                 if encoder_optimizer is not None:
                     encoder_optimizer.step()
-
 
                 # for inception score
                 pred = self.inception_model(self.fake_imgs[-1].detach())

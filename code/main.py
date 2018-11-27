@@ -141,9 +141,10 @@ if __name__ == "__main__":
         # from trainer import GANTrainer as trainer
     # else:
         # from trainer import condGANTrainer as trainer
-    from trainer import condGANTrainer as trainer
+
+    from trainer import condGANTrainer
     print ('... starting training')
-    algo = trainer(output_dir, dataloader, imsize)
+    algo = condGANTrainer(output_dir, dataloader, imsize)
 
     start_t = time.time()
     if cfg.TRAIN.FLAG:
