@@ -250,7 +250,13 @@ class G_NET(nn.Module):
         if cfg.TREE.BRANCH_NUM > 2:
             self.h_net3 = NEXT_STAGE_G(self.gf_dim // 2)
             self.img_net3 = GET_IMAGE_G(self.gf_dim // 4)
-
+        if cfg.TREE.BRANCH_NUM > 3: # Recommended structure (mainly limited by GPU memory), and not test yet
+            self.h_net4 = NEXT_STAGE_G(self.gf_dim // 4, num_residual=1)
+            self.img_net4 = GET_IMAGE_G(self.gf_dim // 8)
+        if cfg.TREE.BRANCH_NUM > 4:
+            self.h_net4 = NEXT_STAGE_G(self.gf_dim // 8, num_residual=1)
+            self.img_net4 = GET_IMAGE_G(self.gf_dim // 16)
+            
     def forward(self, z_code, text_embedding=None):
         if cfg.GAN.B_CONDITION and text_embedding is not None:
             c_code, mu, logvar = self.ca_net(text_embedding)
@@ -265,6 +271,14 @@ class G_NET(nn.Module):
             h_code2 = self.h_net2(h_code1, c_code)
             fake_img2 = self.img_net2(h_code2)
             fake_imgs.append(fake_img2)
+        if cfg.TREE.BRANCH_NUM > 2:
+            h_code3 = self.h_net3(h_code2, c_code)
+            fake_img3 = self.img_net3(h_code3)
+            fake_imgs.append(fake_img3)
+        if cfg.TREE.BRANCH_NUM > 3:
+            h_code4 = self.h_net4(h_code3, c_code)
+            fake_img4 = self.img_net4(h_code4)
+            fake_imgs.append(fake_img4)
 
         return fake_imgs, mu, logvar
 
