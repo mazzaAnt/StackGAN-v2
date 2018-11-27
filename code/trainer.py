@@ -471,14 +471,15 @@ class condGANTrainer(object):
                 encoder.fine_tune(fine_tune_encoder)
                 encoder_optimizer = torch.optim.Adam(params=filter(lambda p: p.requires_grad, encoder.parameters()),
                                                      lr=1e-4) if fine_tune_encoder else None
-                
-                imgs = encoder(np.array(self.fake_imgs))
-                scores, caps_sorted, decode_lengths, alphas, sort_ind = decoder(imgs, caps, caplens)
-                targets = caps_sorted[:, 1:]
-                scores, _ = pack_padded_sequence(scores, decode_lengths, batch_first=True).cuda()
-                targets, _ = pack_padded_sequence(targets, decode_lengths, batch_first=True).cuda()
 
-                SATloss = self.SATcriterion(scores, targets) + 1 * ((1. - alphas.sum(dim=1)) ** 2).mean()
+                SATloss = 0.
+                for i in range(len(self.fake_imgs)):
+                    imgs = encoder(self.fake_imgs[i])
+                    scores, caps_sorted, decode_lengths, alphas, sort_ind = decoder(imgs, caps, caplens)
+                    targets = caps_sorted[:, 1:]
+                    scores, _ = pack_padded_sequence(scores, decode_lengths, batch_first=True).cuda()
+                    targets, _ = pack_padded_sequence(targets, decode_lengths, batch_first=True).cuda()
+                    SATloss += self.SATcriterion(scores, targets) + 1 * ((1. - alphas.sum(dim=1)) ** 2).mean()
 
                 decoder_optimizer.zero_grad()
                 if encoder_optimizer is not None:
