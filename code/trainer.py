@@ -400,7 +400,7 @@ class condGANTrainer(object):
 
         # Show, Attend, and Tell Dataloader
         train_loader = torch.utils.data.DataLoader(
-                    CaptionDataset(data_folder, data_name, 'TRAIN', transform=transforms.Compose([normalize])),
+                    CaptionDataset(data_folder, data_name, 'train', transform=transforms.Compose([normalize])),
                     batch_size=self.batch_size, shuffle=True, num_workers=int(cfg.WORKERS), pin_memory=True)
 
         if cfg.CUDA:
