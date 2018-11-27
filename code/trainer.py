@@ -474,8 +474,8 @@ class condGANTrainer(object):
 
                 SATloss = 0.
                 for i in range(len(self.fake_imgs)):
-                    imgs = encoder(self.fake_imgs[i])
-                    scores, caps_sorted, decode_lengths, alphas, sort_ind = decoder(imgs, caps, caplens)
+                    imgs = encoder(self.fake_imgs[i].cuda())
+                    scores, caps_sorted, decode_lengths, alphas, sort_ind = decoder(imgs.cuda(), caps.cuda(), caplens.cuda())
                     targets = caps_sorted[:, 1:]
                     scores, _ = pack_padded_sequence(scores, decode_lengths, batch_first=True).cuda()
                     targets, _ = pack_padded_sequence(targets, decode_lengths, batch_first=True).cuda()
