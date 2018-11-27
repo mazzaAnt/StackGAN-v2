@@ -108,6 +108,7 @@ def negative_log_posterior_probability(predictions, num_splits=1):
 
 
 def load_network(gpus):
+    print ('load network, gpus', gpus)
     netG = G_NET()
     netG.apply(weights_init)
     netG = torch.nn.DataParallel(netG, device_ids=gpus)
@@ -442,6 +443,8 @@ class condGANTrainer(object):
                 noise.data.normal_(0, 1)
                 self.fake_imgs, self.mu, self.logvar = \
                     self.netG(noise, self.txt_embedding)
+                
+                assert len(self.fake_imgs) == self.num_Ds
                 # self.fake_imgs[0].shape = [12, 3, 64, 64]; batch_size = 12
 
                 #######################################################
@@ -487,6 +490,8 @@ class condGANTrainer(object):
                 ######################################################
                 if cfg.DEBUG: print (step, '... update D network')
                 errD_total = 0
+                print (self.num_Ds)
+                print (len(self.fake_imgs))
                 for i in range(self.num_Ds):
                     errD = self.train_Dnet(i, count)
                     errD_total += errD
