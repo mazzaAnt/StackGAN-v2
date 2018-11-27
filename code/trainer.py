@@ -472,7 +472,7 @@ class condGANTrainer(object):
                 encoder_optimizer = torch.optim.Adam(params=filter(lambda p: p.requires_grad, encoder.parameters()),
                                                      lr=1e-4) if fine_tune_encoder else None
                 
-                imgs = encoder(self.fake_imgs)
+                imgs = encoder(torch.FloatTensor(self.fake_imgs))
                 scores, caps_sorted, decode_lengths, alphas, sort_ind = decoder(imgs, caps, caplens)
                 targets = caps_sorted[:, 1:]
                 scores, _ = pack_padded_sequence(scores, decode_lengths, batch_first=True).cuda()
