@@ -3,7 +3,7 @@ DEBUG: False
 DATASET_NAME: 'birds'
 EMBEDDING_TYPE: 'cnn-rnn'
 DATA_DIR: '../data/birds'
-GPU_ID: '0,1,2,3'
+GPU_ID: '0,1,2,3,4,5,6,7'
 WORKERS: 1
 
 
@@ -15,7 +15,7 @@ TRAIN:
     FLAG: True
     NET_G: ''  # '../output/birds_3stages/Model/netG_epoch_700.pth'
     NET_D: ''  # '../output/birds_3stages/Model/netD'
-    BATCH_SIZE: 12
+    BATCH_SIZE: 3 
     MAX_EPOCH: 100
     SNAPSHOT_INTERVAL: 2000
     DISCRIMINATOR_LR: 0.0002

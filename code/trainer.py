@@ -472,7 +472,7 @@ class condGANTrainer(object):
                 encoder_optimizer = torch.optim.Adam(params=filter(lambda p: p.requires_grad, encoder.parameters()),
                                                      lr=1e-4) if fine_tune_encoder else None
                 
-                imgs = encoder(np.array(self.fake_imgs))
+                imgs = encoder(self.fake_imgs[-1])
                 scores, caps_sorted, decode_lengths, alphas, sort_ind = decoder(imgs, caps, caplens)
                 targets = caps_sorted[:, 1:]
                 scores, _ = pack_padded_sequence(scores, decode_lengths, batch_first=True).cuda()
@@ -489,8 +489,6 @@ class condGANTrainer(object):
                 ######################################################
                 if cfg.DEBUG: print (step, '... update D network')
                 errD_total = 0
-                # print (self.num_Ds)
-                # print (len(self.fake_imgs))
                 for i in range(self.num_Ds):
                     errD = self.train_Dnet(i, count)
                     errD_total += errD
