@@ -233,7 +233,7 @@ def save_img_results(imgs_tcpu, fake_imgs, num_imgs,
 # ################# Text to image task############################ #
 class condGANTrainer(object):
     def __init__(self, output_dir, data_loader, imsize):
-        print ('condGANTrainer')
+        print ('... creating condGANTrainer')
         if cfg.TRAIN.FLAG:
             print ('...training')
             self.model_dir = os.path.join(output_dir, 'Model')
