@@ -1,6 +1,3 @@
-
-# -*- coding: utf-8 -*- 
-
 from __future__ import print_function
 import torch
 import torchvision.transforms as transforms
@@ -110,41 +107,37 @@ if __name__ == "__main__":
     # Get data loader
     imsize = cfg.TREE.BASE_SIZE * (2 ** (cfg.TREE.BRANCH_NUM-1))
     image_transform = transforms.Compose([
-        transforms.Resize(int(imsize * 76 / 4)),
+        transforms.Scale(int(imsize * 76 / 64)),
         transforms.RandomCrop(imsize),
         transforms.RandomHorizontalFlip()])
-    # if cfg.DATA_DIR.find('lsun') != -1:
-        # from datasets import LSUNClass
-        # dataset = LSUNClass('%s/%s_%s_lmdb' %
-                            # (cfg.DATA_DIR, cfg.DATASET_NAME, split_dir),
-                            # base_size=cfg.TREE.BASE_SIZE, transform=image_transform)
-    # elif cfg.DATA_DIR.find('imagenet') != -1:
-        # from datasets import ImageFolder
-        # dataset = ImageFolder(cfg.DATA_DIR, split_dir='train',
-                              # custom_classes=CLASS_DIC[cfg.DATASET_NAME],
-                              # base_size=cfg.TREE.BASE_SIZE,
-                              # transform=image_transform)
-    if cfg.GAN.B_CONDITION:  # text to image task
+    if cfg.DATA_DIR.find('lsun') != -1:
+        from datasets import LSUNClass
+        dataset = LSUNClass('%s/%s_%s_lmdb' %
+                            (cfg.DATA_DIR, cfg.DATASET_NAME, split_dir),
+                            base_size=cfg.TREE.BASE_SIZE, transform=image_transform)
+    elif cfg.DATA_DIR.find('imagenet') != -1:
+        from datasets import ImageFolder
+        dataset = ImageFolder(cfg.DATA_DIR, split_dir='train',
+                              custom_classes=CLASS_DIC[cfg.DATASET_NAME],
+                              base_size=cfg.TREE.BASE_SIZE,
+                              transform=image_transform)
+    elif cfg.GAN.B_CONDITION:  # text to image task
         from datasets import TextDataset
         dataset = TextDataset(cfg.DATA_DIR, split_dir,
                               base_size=cfg.TREE.BASE_SIZE,
                               transform=image_transform)
     assert dataset
     num_gpu = len(cfg.GPU_ID.split(','))
-    print ('... creating dataloader')
     dataloader = torch.utils.data.DataLoader(
         dataset, batch_size=cfg.TRAIN.BATCH_SIZE * num_gpu,
         drop_last=True, shuffle=bshuffle, num_workers=int(cfg.WORKERS))
 
     # Define models and go to train/evaluate
-    # if not cfg.GAN.B_CONDITION:
-        # from trainer import GANTrainer as trainer
-    # else:
-        # from trainer import condGANTrainer as trainer
-
-    from trainer import condGANTrainer
-    print ('... starting training')
-    algo = condGANTrainer(output_dir, dataloader, imsize)
+    if not cfg.GAN.B_CONDITION:
+        from trainer import GANTrainer as trainer
+    else:
+        from trainer import condGANTrainer as trainer
+    algo = trainer(output_dir, dataloader, imsize)
 
     start_t = time.time()
     if cfg.TRAIN.FLAG:

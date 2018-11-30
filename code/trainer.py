@@ -1,27 +1,26 @@
 from __future__ import print_function
 from six.moves import range
 
+import torchvision.transforms as transforms
 import torch.backends.cudnn as cudnn
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
 import torch.optim as optim
 import torchvision.utils as vutils
-import torchvision.transforms as transforms
 import numpy as np
 import os
 import time
-import json
 from PIL import Image, ImageFont, ImageDraw
 from copy import deepcopy
 
 from miscc.config import cfg
 from miscc.utils import mkdir_p
 
+from CaptionDatasets import *
+
 from tensorboard import summary
 from tensorboard import FileWriter
-
-from CaptionDatasets import *
 
 from model import G_NET, D_NET64, D_NET128, D_NET256, D_NET512, D_NET1024, INCEPTION_V3
 
@@ -108,7 +107,6 @@ def negative_log_posterior_probability(predictions, num_splits=1):
 
 
 def load_network(gpus):
-    print ('load network, gpus', gpus)
     netG = G_NET()
     netG.apply(weights_init)
     netG = torch.nn.DataParallel(netG, device_ids=gpus)
@@ -137,7 +135,7 @@ def load_network(gpus):
     if cfg.TRAIN.NET_G != '':
         state_dict = torch.load(cfg.TRAIN.NET_G)
         netG.load_state_dict(state_dict)
-        print('>>>>>> Load ', cfg.TRAIN.NET_G)
+        print('Load ', cfg.TRAIN.NET_G)
 
         istart = cfg.TRAIN.NET_G.rfind('_') + 1
         iend = cfg.TRAIN.NET_G.rfind('.')
@@ -146,7 +144,7 @@ def load_network(gpus):
 
     if cfg.TRAIN.NET_D != '':
         for i in range(len(netsD)):
-            print('>>>>>> Load %s_%d.pth' % (cfg.TRAIN.NET_D, i))
+            print('Load %s_%d.pth' % (cfg.TRAIN.NET_D, i))
             state_dict = torch.load('%s%d.pth' % (cfg.TRAIN.NET_D, i))
             netsD[i].load_state_dict(state_dict)
 
@@ -193,6 +191,21 @@ def save_model(netG, avg_param_G, netsD, epoch, model_dir):
             '%s/netD%d.pth' % (model_dir, i))
     print('Save G/Ds models.')
 
+def save_real(imgs_tcpu, image_dir):
+    num = cfg.TRAIN.VIS_COUNT
+
+    # The range of real_img (i.e., self.imgs_tcpu[i][0:num])
+    # is changed to [0, 1] by function vutils.save_image
+    real_img = imgs_tcpu[-1][0:num]
+    vutils.save_image(
+        real_img, '%s/real_samples.png' % (image_dir),
+        normalize=True)
+    real_img_set = vutils.make_grid(real_img).numpy()
+    real_img_set = np.transpose(real_img_set, (1, 2, 0))
+    real_img_set = real_img_set * 255
+    real_img_set = real_img_set.astype(np.uint8)
+    sup_real_img = summary.image('real_img', real_img_set)
+
 
 def save_img_results(imgs_tcpu, fake_imgs, num_imgs,
                      count, image_dir, summary_writer):
@@ -216,7 +229,7 @@ def save_img_results(imgs_tcpu, fake_imgs, num_imgs,
         # The range of fake_img.data (i.e., self.fake_imgs[i][0:num])
         # is still [-1. 1]...
         vutils.save_image(
-            fake_img.data, '%s/count_%09d_fake_samples%d.png' %
+            fake_img.data, '%s/count_%09d_fake_samples_%d.png' %
             (image_dir, count, i), normalize=True)
 
         fake_img_set = vutils.make_grid(fake_img.data).cpu().numpy()
@@ -233,9 +246,7 @@ def save_img_results(imgs_tcpu, fake_imgs, num_imgs,
 # ################# Text to image task############################ #
 class condGANTrainer(object):
     def __init__(self, output_dir, data_loader, imsize):
-        print ('... creating condGANTrainer')
         if cfg.TRAIN.FLAG:
-            print ('...training')
             self.model_dir = os.path.join(output_dir, 'Model')
             self.image_dir = os.path.join(output_dir, 'Image')
             self.log_dir = os.path.join(output_dir, 'Log')
@@ -341,45 +352,49 @@ class condGANTrainer(object):
                 self.summary_writer.add_summary(summary_D, count)
 
         # Compute color consistency losses
-        # if cfg.TRAIN.COEFF.COLOR_LOSS > 0:
-            # if self.num_Ds > 1:
-                # mu1, covariance1 = compute_mean_covariance(self.fake_imgs[-1])
-                # mu2, covariance2 = \
-                    # compute_mean_covariance(self.fake_imgs[-2].detach())
-                # like_mu2 = cfg.TRAIN.COEFF.COLOR_LOSS * nn.MSELoss()(mu1, mu2)
-                # like_cov2 = cfg.TRAIN.COEFF.COLOR_LOSS * 5 * \
-                    # nn.MSELoss()(covariance1, covariance2)
-                # errG_total = errG_total + like_mu2 + like_cov2
-                # if flag == 0:
-                    # sum_mu = summary.scalar('G_like_mu2', like_mu2.item())
-                    # self.summary_writer.add_summary(sum_mu, count)
-                    # sum_cov = summary.scalar('G_like_cov2', like_cov2.item())
-                    # self.summary_writer.add_summary(sum_cov, count)
-            # if self.num_Ds > 2:
-                # mu1, covariance1 = compute_mean_covariance(self.fake_imgs[-2])
-                # mu2, covariance2 = \
-                    # compute_mean_covariance(self.fake_imgs[-3].detach())
-                # like_mu1 = cfg.TRAIN.COEFF.COLOR_LOSS * nn.MSELoss()(mu1, mu2)
-                # like_cov1 = cfg.TRAIN.COEFF.COLOR_LOSS * 5 * \
-                    # nn.MSELoss()(covariance1, covariance2)
-                # errG_total = errG_total + like_mu1 + like_cov1
-                # if flag == 0:
-                    # sum_mu = summary.scalar('G_like_mu1', like_mu1.item())
-                    # self.summary_writer.add_summary(sum_mu, count)
-                    # sum_cov = summary.scalar('G_like_cov1', like_cov1.item())
-                    # self.summary_writer.add_summary(sum_cov, count)
+        if cfg.TRAIN.COEFF.COLOR_LOSS > 0:
+            if self.num_Ds > 1:
+                mu1, covariance1 = compute_mean_covariance(self.fake_imgs[-1])
+                mu2, covariance2 = \
+                    compute_mean_covariance(self.fake_imgs[-2].detach())
+                like_mu2 = cfg.TRAIN.COEFF.COLOR_LOSS * nn.MSELoss()(mu1, mu2)
+                like_cov2 = cfg.TRAIN.COEFF.COLOR_LOSS * 5 * \
+                    nn.MSELoss()(covariance1, covariance2)
+                errG_total = errG_total + like_mu2 + like_cov2
+                if flag == 0:
+                    sum_mu = summary.scalar('G_like_mu2', like_mu2.item())
+                    self.summary_writer.add_summary(sum_mu, count)
+                    sum_cov = summary.scalar('G_like_cov2', like_cov2.item())
+                    self.summary_writer.add_summary(sum_cov, count)
+            if self.num_Ds > 2:
+                mu1, covariance1 = compute_mean_covariance(self.fake_imgs[-2])
+                mu2, covariance2 = \
+                    compute_mean_covariance(self.fake_imgs[-3].detach())
+                like_mu1 = cfg.TRAIN.COEFF.COLOR_LOSS * nn.MSELoss()(mu1, mu2)
+                like_cov1 = cfg.TRAIN.COEFF.COLOR_LOSS * 5 * \
+                    nn.MSELoss()(covariance1, covariance2)
+                errG_total = errG_total + like_mu1 + like_cov1
+                if flag == 0:
+                    sum_mu = summary.scalar('G_like_mu1', like_mu1.item())
+                    self.summary_writer.add_summary(sum_mu, count)
+                    sum_cov = summary.scalar('G_like_cov1', like_cov1.item())
+                    self.summary_writer.add_summary(sum_cov, count)
 
         kl_loss = KL_loss(mu, logvar) * cfg.TRAIN.COEFF.KL
         errG_total = errG_total + kl_loss
+        # Postpone the backward propagation
         # errG_total.backward()
         # self.optimizerG.step()
         return kl_loss, errG_total
 
     def train(self):
-        self.netG, self.netsD, self.num_Ds, self.inception_model, start_count = load_network(self.gpus)
+        self.netG, self.netsD, self.num_Ds,\
+            self.inception_model, start_count = load_network(self.gpus)
         avg_param_G = copy_G_params(self.netG)
 
-        self.optimizerG, self.optimizersD = define_optimizers(self.netG, self.netsD)
+        self.optimizerG, self.optimizersD = \
+            define_optimizers(self.netG, self.netsD)
+
         self.criterion = nn.BCELoss()
         self.SATcriterion = nn.CrossEntropyLoss()
 
@@ -394,19 +409,19 @@ class condGANTrainer(object):
         fixed_noise = Variable(torch.FloatTensor(self.batch_size, nz).normal_(0, 1))
 
         # Data parameters
-        data_folder = './birds_output'  # folder with data files saved by create_input_files.py
+        data_folder = '../../myStackGAN/code/birds_output'  # folder with data files saved by create_input_files.py
         data_name = 'CUB_5_cap_per_img_5_min_word_freq'  # base name shared by data files
 
         normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 
         # Show, Attend, and Tell Dataloader
         train_loader = torch.utils.data.DataLoader(
-                    CaptionDataset(data_folder, data_name, 'train', transform=transforms.Compose([normalize])),
+                    CaptionDataset(data_folder, data_name, 'TRAIN', transform=transforms.Compose([normalize])),
                     batch_size=self.batch_size, shuffle=True, num_workers=int(cfg.WORKERS), pin_memory=True)
 
         if cfg.CUDA:
             self.criterion.cuda()
-            self.SATcriterion.cuda()
+            self.SATcriterion.cuda() # Compute SATloss
             self.real_labels = self.real_labels.cuda()
             self.fake_labels = self.fake_labels.cuda()
             self.gradient_one = self.gradient_one.cuda()
@@ -416,50 +431,53 @@ class condGANTrainer(object):
         predictions = []
         count = start_count
         start_epoch = start_count // (self.num_batches)
-
         for epoch in range(start_epoch, self.max_epoch):
             start_t = time.time()
 
-            for step, data in enumerate(zip(self.data_loader, train_loader), 0):
-                print ('step:',step, '/', self.num_batches)
+            # for step, data in enumerate(self.data_loader, 0):
+            for step, data in enumerate(zip(self.data_loader, train_loader), 0):        
+
                 data_1 = data[0]
                 _, caps, caplens = data[1]
-                caps.long().cuda()
-                caplens.long().cuda()
                 data = data_1
 
                 #######################################################
                 # (0) Prepare training data
                 ######################################################
-                if cfg.DEBUG: print (step, '... prepare training data')
                 self.imgs_tcpu, self.real_imgs, self.wrong_imgs, \
                     self.txt_embedding = self.prepare_data(data)
+
+                # Testing line for real samples
+                if epoch == start_epoch and step == 0:
+                    print ('Checking real samples at first...')
+                    save_real(self.imgs_tcpu, self.image_dir)
 
                 #######################################################
                 # (1) Generate fake images
                 ######################################################
-                if cfg.DEBUG: print (step, '... generate fake images')
                 noise.data.normal_(0, 1)
                 self.fake_imgs, self.mu, self.logvar = \
                     self.netG(noise, self.txt_embedding)
-                
-                # assert len(self.fake_imgs) == self.num_Ds
-                # self.fake_imgs[0].shape = [12, 3, 64, 64]; batch_size = 12
+
+                # len(self.fake_imgs) = NUM_BRANCHES
+                # self.fake_imgs[0].shape = [batch_size, 3, 64, 64]
+                # self.fake_imgs[1].shape = [batch_size, 3, 128, 128]
+                # self.fake_imgs[2].shape = [batch_size, 3, 256, 256]
 
                 #######################################################
-                # (*) Forward fake_imgs to Show, Attend and Tell
+                # (*) Forward fake images to SAT
                 ######################################################
-                if cfg.DEBUG: print (step, '... forward fake images to show,attend, and tell')
                 from SATmodels import Encoder, DecoderWithAttention
                 from torch.nn.utils.rnn import pack_padded_sequence
 
                 fine_tune_encoder = False
 
-                # Read word map
-                word_map_file = os.path.join(data_folder, 'WORDMAP_' + data_name + '.json')
+                # Read word map 
+                word_map_file = os.path.join(data_folder, 'WORDMAP_' + data_name + '.json') 
                 with open(word_map_file, 'r') as j:
                     word_map = json.load(j)
 
+                # Define the encoder/decoder structure for SAT model
                 decoder = DecoderWithAttention(attention_dim=512,
                                                embed_dim=512,
                                                decoder_dim=512,
@@ -467,19 +485,25 @@ class condGANTrainer(object):
                                                dropout=0.5).cuda()
                 decoder_optimizer = torch.optim.Adam(params=filter(lambda p: p.requires_grad, decoder.parameters()),
                                                      lr=4e-4)
+
                 encoder = Encoder().cuda()
                 encoder.fine_tune(fine_tune_encoder)
                 encoder_optimizer = torch.optim.Adam(params=filter(lambda p: p.requires_grad, encoder.parameters()),
                                                      lr=1e-4) if fine_tune_encoder else None
-                
-                imgs = encoder(self.fake_imgs[-1])
-                scores, caps_sorted, decode_lengths, alphas, sort_ind = decoder(imgs, caps, caplens)
-                targets = caps_sorted[:, 1:]
-                scores, _ = pack_padded_sequence(scores, decode_lengths, batch_first=True).cuda()
-                targets, _ = pack_padded_sequence(targets, decode_lengths, batch_first=True).cuda()
 
-                SATloss = self.SATcriterion(scores, targets) + 1 * ((1. - alphas.sum(dim=1)) ** 2).mean()
+                SATloss = 0
 
+                # Compute the SAT loss after forwarding the SAT model
+                for idx in range(len(self.fake_imgs)):
+                    img = encoder(self.fake_imgs[idx])
+                    scores, caps_sorted, decode_lengths, alphas, sort_ind = decoder(img, caps, caplens)
+                    targets = caps_sorted[:, 1:]
+                    scores, _ = pack_padded_sequence(scores, decode_lengths, batch_first=True).cuda()
+                    targets, _ = pack_padded_sequence(targets, decode_lengths, batch_first=True).cuda()
+                    SATloss += self.SATcriterion(scores, targets) + 1 * ((1. - alphas.sum(dim=1)) ** 2).mean()
+
+
+                # Set zero_grad for encoder/decoder
                 decoder_optimizer.zero_grad()
                 if encoder_optimizer is not None:
                     encoder_optimizer.zero_grad()
@@ -487,7 +511,6 @@ class condGANTrainer(object):
                 #######################################################
                 # (2) Update D network
                 ######################################################
-                if cfg.DEBUG: print (step, '... update D network')
                 errD_total = 0
                 for i in range(self.num_Ds):
                     errD = self.train_Dnet(i, count)
@@ -496,28 +519,26 @@ class condGANTrainer(object):
                 #######################################################
                 # (3) Update G network: maximize log(D(G(z)))
                 ######################################################
-                if cfg.DEBUG: print (step, '... update G network: maximize log(D(G(z))')
                 kl_loss, errG_total = self.train_Gnet(count)
+                for p, avg_p in zip(self.netG.parameters(), avg_param_G):
+                    avg_p.mul_(0.999).add_(0.001, p.data)
 
-                # Combine with G and SAT first
-                # And then do back propagation
+                # Combine with G and SAT first, then back propagation
                 errG_total += SATloss
                 errG_total.backward()
                 self.optimizerG.step()
 
-                for p, avg_p in zip(self.netG.parameters(), avg_param_G):
-                    avg_p.mul_(0.999).add_(0.001, p.data)
-
                 #######################################################
                 # (*) Update SAT network:
                 ######################################################
-                if cfg.DEBUG: print (step, '... update sat network')
                 # Update weights
                 decoder_optimizer.step()
                 if encoder_optimizer is not None:
                     encoder_optimizer.step()
 
-                # for inception score
+                #######################################################
+                # (*) Prediction and Inception score:
+                ######################################################
                 pred = self.inception_model(self.fake_imgs[-1].detach())
                 predictions.append(pred.data.cpu().numpy())
 
@@ -531,14 +552,15 @@ class condGANTrainer(object):
 
                 count += 1
 
+                #######################################################
+                # (*) Save Images/Log/Model per SNAPSHOT_INTERVAL:
+                ######################################################
                 if count % cfg.TRAIN.SNAPSHOT_INTERVAL == 0:
-                    if cfg.DEBUG: print (step, '... snapshot')
                     save_model(self.netG, avg_param_G, self.netsD, count, self.model_dir)
                     # Save images
                     backup_para = copy_G_params(self.netG)
                     load_params(self.netG, avg_param_G)
-
-                    # Produce fake images from learned netG
+                    #
                     self.fake_imgs, _, _ = self.netG(fixed_noise, self.txt_embedding)
                     save_img_results(self.imgs_tcpu, self.fake_imgs, self.num_Ds,
                                      count, self.image_dir, self.summary_writer)
@@ -553,8 +575,7 @@ class condGANTrainer(object):
                         m_incep = summary.scalar('Inception_mean', mean)
                         self.summary_writer.add_summary(m_incep, count)
                         #
-                        mean_nlpp, std_nlpp = \
-                            negative_log_posterior_probability(predictions, 10)
+                        mean_nlpp, std_nlpp = negative_log_posterior_probability(predictions, 10)
                         m_nlpp = summary.scalar('NLPP_mean', mean_nlpp)
                         self.summary_writer.add_summary(m_nlpp, count)
                         #
@@ -628,7 +649,7 @@ class condGANTrainer(object):
                 torch.load(cfg.TRAIN.NET_G,
                            map_location=lambda storage, loc: storage)
             netG.load_state_dict(state_dict)
-            print('>>>>>> Load ', cfg.TRAIN.NET_G)
+            print('Load ', cfg.TRAIN.NET_G)
 
             # the path to save generated images
             s_tmp = cfg.TRAIN.NET_G

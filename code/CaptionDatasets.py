@@ -14,11 +14,11 @@ class CaptionDataset(Dataset):
         """
         :param data_folder: folder where data files are stored
         :param data_name: base name of processed datasets
-        :param split: split, one of 'train', 'val', or 'test'
+        :param split: split, one of 'TRAIN', 'VAL', or 'TEST'
         :param transform: image transform pipeline
         """
         self.split = split
-        assert self.split in {'train', 'val', 'test'}
+        assert self.split in {'TRAIN', 'VAL', 'TEST'}
 
         # Open hdf5 file where images are stored
         self.h = h5py.File(os.path.join(data_folder, self.split + '_IMAGES_' + data_name + '.hdf5'), 'r')
@@ -51,7 +51,7 @@ class CaptionDataset(Dataset):
 
         caplen = torch.LongTensor([self.caplens[i]])
 
-        if self.split is 'train':
+        if self.split is 'TRAIN':
             return img, caption, caplen
         else:
             # For validation of testing, also return all 'captions_per_image' captions to find BLEU-4 score

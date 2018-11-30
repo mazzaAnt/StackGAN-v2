@@ -256,7 +256,7 @@ class G_NET(nn.Module):
         if cfg.TREE.BRANCH_NUM > 4:
             self.h_net4 = NEXT_STAGE_G(self.gf_dim // 8, num_residual=1)
             self.img_net4 = GET_IMAGE_G(self.gf_dim // 16)
-            
+
     def forward(self, z_code, text_embedding=None):
         if cfg.GAN.B_CONDITION and text_embedding is not None:
             c_code, mu, logvar = self.ca_net(text_embedding)
