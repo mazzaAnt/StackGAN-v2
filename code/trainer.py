@@ -409,7 +409,7 @@ class condGANTrainer(object):
         fixed_noise = Variable(torch.FloatTensor(self.batch_size, nz).normal_(0, 1))
 
         # Data parameters
-        data_folder = '../../myStackGAN/code/birds_output'  # folder with data files saved by create_input_files.py
+        data_folder = 'birds_output'  # folder with data files saved by create_input_files.py
         data_name = 'CUB_5_cap_per_img_5_min_word_freq'  # base name shared by data files
 
         normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
