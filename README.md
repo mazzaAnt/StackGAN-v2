@@ -6,13 +6,15 @@
 
 - [Inception score evaluation](https://github.com/hanzhanggit/StackGAN-inception-model)
 
+<p align="center">
 
 <img src="examples/arch.png"/>
 
 StackGAN++                 |  Combined "CycleStein" Model
 :-------------------------:|:-------------------------:
-![]<img src="examples/stackgan__flowchart.png"/>  |  ![]<img src="examples/cyclestein_flowchart.png"/>
+<img src="examples/stackgan__flowchart.png"/>  | <img src="examples/cyclestein_flowchart.png"/>
 
+</p>
 
 
 ### Dependencies
