@@ -7,7 +7,7 @@
 - [Inception score evaluation](https://github.com/hanzhanggit/StackGAN-inception-model)
 
 
-<img src="examples/framework.jpg" width="900px" height="350px"/>
+<img src="examples/arch.png"/>
 
 
 
