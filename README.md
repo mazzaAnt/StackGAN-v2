@@ -11,7 +11,7 @@
 
 StackGAN++                 |  Combined "CycleStein" Model
 :-------------------------:|:-------------------------:
-![]<img src="examples/stackgan_flowchart.png"/>  |  ![]<img src="examples/cyclestein_flowchart.png"/>
+![]<img src="examples/stackgan__flowchart.png"/>  |  ![]<img src="examples/cyclestein_flowchart.png"/>
 
 
 
