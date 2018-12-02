@@ -9,21 +9,16 @@
 
 <img src="examples/arch.png"/>
 
+StackGAN++                 |  Combined "CycleStein" Model
+:-------------------------:|:-------------------------:
+![]<img src="examples/stackgan_flowchart.png"/>  |  ![]<img src="examples/cyclestein_flowchart.png"/>
+
 
 
 ### Dependencies
 python 3.x
-
 Pytorch
-
-In addition, please add the project folder to PYTHONPATH and `pip install` the following packages:
-- `tensorboard`
-- `python-dateutil`
-- `easydict`
-- `pandas`
-- `torchfile`
-
-
+`pip install` the following packages:`tensorboard`,`python-dateutil`,`easydict`,`pandas`,`torchfile`
 
 **Data**
 
