@@ -6,9 +6,10 @@
 
 - [Inception score evaluation](https://github.com/hanzhanggit/StackGAN-inception-model)
 
-
+**Architecture**
 <img src="examples/arch.png"/>
 
+**Dataflow**
 StackGAN++                 |  Combined "CycleStein" Model
 :-------------------------:|:-------------------------:
    <img src="examples/stackgan__flowchart.png"/>  |    <img src="examples/cyclestein_flowchart.png"/>
