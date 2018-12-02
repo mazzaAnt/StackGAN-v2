@@ -1,13 +1,11 @@
-# StackGAN-v2
+# Combined "CycleStein" Model
 
-- [StackGAN-v1: Tensorflow implementation](https://github.com/hanzhanggit/StackGAN)
+- [StackGAN++: Pytorch implementation](https://github.com/hanzhanggit/StackGAN-v2)
 
-- [StackGAN-v1: Pytorch implementation](https://github.com/hanzhanggit/StackGAN-Pytorch)
+- [Show, Attend, and Tell: Sgrvinod Pytorch implementation](https://github.com/sgrvinod/a-PyTorch-Tutorial-to-Image-Captioning)
 
 - [Inception score evaluation](https://github.com/hanzhanggit/StackGAN-inception-model)
 
-
-Pytorch implementation for reproducing StackGAN_v2 results in the paper [StackGAN++: Realistic Image Synthesis with Stacked Generative Adversarial Networks](https://arxiv.org/abs/1710.10916) by Han Zhang*, Tao Xu*, Hongsheng Li, Shaoting Zhang, Xiaogang Wang,   Xiaolei Huang, Dimitris Metaxas.
 
 <img src="examples/framework.jpg" width="900px" height="350px"/>
 
