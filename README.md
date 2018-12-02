@@ -49,7 +49,7 @@ In addition, please add the project folder to PYTHONPATH and `pip install` the f
 
 
 **Generated Bird Examples**
-![](examples/)
+![](examples/yuan_1_branch_count_000028000_fake_samples0.png)
 
 
 
@@ -57,6 +57,6 @@ In addition, please add the project folder to PYTHONPATH and `pip install` the f
 
 **References**
 
-- Generative Adversarial Text-to-Image Synthesis [Paper](https://arxiv.org/abs/1605.05396) [Code](https://github.com/reedscot/icml2016)
-- Learning Deep Representations of Fine-grained Visual Descriptions [Paper](https://arxiv.org/abs/1605.05395) [Code](https://github.com/reedscot/cvpr2016)
+- [StackGAN++: Realistic Image Synthesis with Stacked Generative Adversarial Networks](https://arxiv.org/abs/1710.10916) 
+- [Show, Attend and Tell: Neural Image Caption Generation with Visual Attention](https://arxiv.org/abs/1502.03044)
 
