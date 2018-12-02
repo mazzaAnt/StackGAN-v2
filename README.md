@@ -1,5 +1,7 @@
 # Combined "CycleStein" Model
 
+Composed of a StackGAN++ model as the first generator (Zhang,  2018) and an image caption-generating model  as  the  second  generator  (Xu,  2015)  and based  on  cycleGAN  (Zhu,  1  12:   2017).The  images  generated  by StackGAN++  model  serve  as  the  input  to  the  the  image-captioning model, while the captions output by the image-captioning model are then compared with the captions input to the StackGAN++ model by computing the consistency loss between them.  
+
 - [StackGAN++: Pytorch implementation](https://github.com/hanzhanggit/StackGAN-v2)
 
 - [Show, Attend, and Tell: Sgrvinod Pytorch implementation](https://github.com/sgrvinod/a-PyTorch-Tutorial-to-Image-Captioning)
