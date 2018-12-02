@@ -1,5 +1,5 @@
 CONFIG_NAME: '3stages'
-
+DEBUG: False
 DATASET_NAME: 'birds'
 EMBEDDING_TYPE: 'cnn-rnn'
 DATA_DIR: '../data/birds'
@@ -15,8 +15,8 @@ TRAIN:
     FLAG: True
     NET_G: ''  # '../output/birds_3stages/Model/netG_epoch_700.pth'
     NET_D: ''  # '../output/birds_3stages/Model/netD'
-    BATCH_SIZE: 12
-    MAX_EPOCH: 600
+    BATCH_SIZE: 3 
+    MAX_EPOCH: 100
     SNAPSHOT_INTERVAL: 2000
     DISCRIMINATOR_LR: 0.0002
     GENERATOR_LR: 0.0002
