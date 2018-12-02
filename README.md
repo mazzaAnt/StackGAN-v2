@@ -27,52 +27,20 @@ In addition, please add the project folder to PYTHONPATH and `pip install` the f
 
 **Data**
 
-1. Download our preprocessed char-CNN-RNN text embeddings for [birds](https://drive.google.com/open?id=0B3y_msrWZaXLT1BZdVdycDY5TEE) and save them to `data/`
-  - [Optional] Follow the instructions [reedscot/icml2016](https://github.com/reedscot/icml2016) to download the pretrained char-CNN-RNN text encoders and extract text embeddings.
+1. Download our preprocessed char-CNN-RNN text embeddings for [birds](https://drive.google.com
 2. Download the [birds](http://www.vision.caltech.edu/visipedia/CUB-200-2011.html) image data. Extract them to `data/birds/`
-3. Download [ImageNet](http://image-net.org/download) dataset and extract the images to `data/imagenet/`
-4. Download [LSUN](https://github.com/fyu/lsun) dataset and save the images to `data/lsun`
-
-
-COCO
-- Uses the conditional GANtrainer in trainer.py
-- Uses the TextDataset class in datasets.py
-- Uses the preprocessed data from https://github.com/taoxugit/AttnGAN  [coco](https://drive.google.com/open?id=1rSnbIGNDGZeHlsUlLdahj0RJ9oo6lgH9) follow instructions on where to put data.
-- Uses embeddings from https://github.com/ypxie/HDGan [embeddingsCOCO](https://www.dropbox.com/sh/aax9prnnb17kpgq/AADiUTJL9wWnLCgPHDEilJHwa?dl=0) put into repspective folders.
-- Uses the 2014 training and validation set from [MS-COCO](http://cocodataset.org/#download)
-- Uses coco_train.yml in the code/cfg for training, uses eval_coco.yml for test
-- Uses inception score at [Inception Score](https://github.com/openai/improved-gan/tree/master/inception_score)
-
-
-
-
-
 
 
 **Training**
 
 - Train a StackGAN-v2 model on the bird (CUB) dataset using our preprocessed embeddings:
   -  `python main.py --cfg cfg/birds_3stages.yml --gpu 0`
-- Train a StackGAN-v2 model on the ImageNet dog subset:
-  -  `python main.py --cfg cfg/dog_3stages_color.yml --gpu 0`
-- Train a StackGAN-v2 model on the ImageNet cat subset:
-  -  `python main.py --cfg cfg/cat_3stages_color.yml --gpu 0`
-- Train a StackGAN-v2 model on the lsun bedroom subset:
-  -  `python main.py --cfg cfg/bedroom_3stages_color.yml --gpu 0`
-- Train a StackGAN-v2 model on the lsun church subset:
-  -  `python main.py --cfg cfg/church_3stages_color.yml --gpu 0`
 - `*.yml` files are example configuration files for training/evaluation our models.
-- If you want to try your own datasets, [here](https://github.com/soumith/ganhacks) are some good tips about how to train GAN. Also, we encourage to try different hyper-parameters and architectures, especially for more complex datasets.
 
 
 
 **Pretrained Model**
 - [StackGAN-v2 for bird](https://drive.google.com/open?id=1s5Yf3nFiXx0lltMFOiJWB6s1LP24RcwH). Download and save it to `models/` (The [inception score](https://github.com/hanzhanggit/StackGAN-inception-model) for this Model is 4.04±0.05)
-- [StackGAN-v2 for dog](https://drive.google.com/open?id=1zcwYfvhsKqb8svQDecTbx_mdYy3TG3F0). Download and save it to `models/` (The [inception score](https://github.com/openai/improved-gan/tree/master/inception_score) for this Model is 9.55±0.11)
-- [StackGAN-v2 for cat](https://drive.google.com/open?id=1yPX62c-eCLCNxpziGX9qF_V6Verom3v9). Download and save it to `models/`
-- [StackGAN-v2 for bedroom](https://drive.google.com/open?id=1Kqowg0ZLZbN1ek5N-YqEw9TlZeI3XV-K). Download and save it to `models/`
-- [StackGAN-v2 for church](https://drive.google.com/open?id=13Pw4PZOkiAM5y_KoOwBzlXK9eQ2hHLfT). Download and save it to `models/`
-
 
 
 **Evaluating**
@@ -85,30 +53,6 @@ COCO
 
 Tsne visualization of randomly generated [birds](https://github.com/hanzhanggit/StackGAN-v2/blob/master/examples/bird_res256_grid50x50.jpg), [dogs](https://github.com/hanzhanggit/StackGAN-v2/blob/master/examples/dog_res256_grid50x50.jpg), [cats](https://github.com/hanzhanggit/StackGAN-v2/blob/master/examples/cat_res256_grid50x50.jpg), [churchs](https://github.com/hanzhanggit/StackGAN-v2/blob/master/examples/church_res256_grid50x50.jpg) and [bedrooms](https://github.com/hanzhanggit/StackGAN-v2/blob/master/examples/bedroom_res256_grid50x50.jpg)
 
-### Citing StackGAN++
-If you find StackGAN useful in your research, please consider citing:
-
-```
-@article{Han17stackgan2,
-  author    = {Han Zhang and Tao Xu and Hongsheng Li and Shaoting Zhang and Xiaogang Wang and Xiaolei Huang and Dimitris Metaxas},
-  title     = {StackGAN++: Realistic Image Synthesis with Stacked Generative Adversarial Networks},
-  journal   = {arXiv: 1710.10916},
-  year      = {2017},
-}
-```
-
-```
-@inproceedings{han2017stackgan,
-Author = {Han Zhang and Tao Xu and Hongsheng Li and Shaoting Zhang and Xiaogang Wang and Xiaolei Huang and Dimitris Metaxas},
-Title = {StackGAN: Text to Photo-realistic Image Synthesis with Stacked Generative Adversarial Networks},
-Year = {2017},
-booktitle = {{ICCV}},
-}
-```
-
-**Our follow-up work**
-
-- [AttnGAN: Fine-Grained Text to Image Generation with Attentional Generative Adversarial Networks](https://arxiv.org/abs/1711.10485) [[Supplementary]](https://1drv.ms/b/s!Aj4exx_cRA4ghK5-kUG-EqH7hgknUA)[[code]](https://github.com/taoxugit/AttnGAN)
 
 
 **References**
