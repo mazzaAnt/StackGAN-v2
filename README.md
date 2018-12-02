@@ -29,8 +29,10 @@ Pytorch
 
 **Data**
 
-1. Download our preprocessed char-CNN-RNN text embeddings for [birds]
+1. Download the preprocessed char-CNN-RNN text embeddings for [birds]
 2. Download the [birds](http://www.vision.caltech.edu/visipedia/CUB-200-2011.html) image data. Extract them to `data/birds/`
+3. Download the preprocessed captioning model inputs for birds
+4. Put into respective folders
 
 
 **Training**
