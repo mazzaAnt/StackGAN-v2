@@ -27,12 +27,9 @@ python 3.x
 Pytorch
 `pip install` the following packages:`tensorboard`,`python-dateutil`,`easydict`,`pandas`,`torchfile`
 
-**Data**
-
-1. Download the preprocessed char-CNN-RNN text embeddings for [birds]
-2. Download the [birds](http://www.vision.caltech.edu/visipedia/CUB-200-2011.html) image data. Extract them to `data/birds/`
-3. Download the preprocessed captioning model inputs for birds
-4. Put into respective folders, xxxx. goes into xxxx, xxxx goes into xxxxxx
+**Setup**
+1. git clone repo
+2. ./bootstrap.sh to download and preprocess all necessary data for the model to train.
 
 
 **Training**
