@@ -33,19 +33,17 @@ Pytorch
 
 
 **Training**
-- python ./StackGAN-v2/code/main.py  --h
-usage: main.py [-h] [--cfg CFG_FILE] [--gpu GPU_ID] [--data_dir DATA_DIR]
-              [--manualSeed MANUALSEED]
+python ./StackGAN-v2/code/main.py  --h\
+usage: main.py [-h] [--cfg CFG_FILE] [--gpu GPU_ID] [--data_dir DATA_DIR][--manualSeed MANUALSEED]\
 
-Train a GAN network
-<p>
-optional arguments:
- -h, --help            show this help message and exit
- --cfg CFG_FILE        optional config file
- --gpu GPU_ID
- --data_dir DATA_DIR
- --manualSeed MANUALSEED manual seed
-</p>
+Train a GAN network\
+optional arguments:\
+ -h, --help            show this help message and exit\
+ --cfg CFG_FILE        optional config file\
+ --gpu GPU_ID\
+ --data_dir DATA_DIR\
+ --manualSeed MANUALSEED manual seed\
+\
 - Train a StackGAN-v2 model on the bird (CUB) dataset using our preprocessed embeddings:
   -  `python main.py --cfg cfg/birds_3stages.yml --gpu 0`
 - `*.yml` files are example configuration files for training/evaluation our models.
