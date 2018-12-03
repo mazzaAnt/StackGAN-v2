@@ -56,7 +56,7 @@ optional arguments:<br/>
 
 **Pretrained Model**
 
-- [StackGAN-v2 for bird](https://drive.google.com/open?id=1s5Yf3nFiXx0lltMFOiJWB6s1LP24RcwH). Download and save it to `models/` (The [inception score](https://github.com/hanzhanggit/StackGAN-inception-model) for this Model is 4.04±0.05)
+- [StackGAN-v2 for bird](). Download and save it to `models/` (The [inception score](https://github.com/hanzhanggit/StackGAN-inception-model)
 
 
 **Evaluating**
