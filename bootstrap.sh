@@ -7,7 +7,7 @@ tar -xzf CUB_200_2011.tgz -C data/birds
 wget http://www.symcernos.com/projectCU/birds_3stages.zip
 unzip -q birds_3stages.zip -d 'models/'
 ROOT=./data/birds/CUB_200_2011/images/
+mkdir -p "code/birds_output"  TEMP_IMAGES
 ls $ROOT | while read dir; do cp ${ROOT}/${dir}/* TEMP_IMAGES; done
 pip3 install tensorboard-pytorch python-dateutil easydict pandas torchfile PyHamcrest
-mkdir -p "code/birds_output"  TEMP_IMAGES
 python3 ./a-PyTorch-Tutorial-to-Image-Captioning.files/create_input_files.py 
