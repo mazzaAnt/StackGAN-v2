@@ -10,4 +10,5 @@ ROOT=./data/birds/CUB_200_2011/images/
 mkdir -p TEMP_IMAGES
 ls $ROOT | while read dir; do cp ${ROOT}/${dir}/* TEMP_IMAGES; done
 pip install tensorboard-pytorch python-dateutil easydict pandas torchfile PyHamcrest
+mkdir -p "code/birds_output"
 python ./a-PyTorch-Tutorial-to-Image-Captioning.files/create_input_files.py 
