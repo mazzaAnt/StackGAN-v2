@@ -23,16 +23,19 @@ StackGAN++                 |  Combined "CycleStein" Model
 
 
 ### Dependencies
+
 python 3.x
 Pytorch
 `pip install` the following packages:`tensorboard`,`python-dateutil`,`easydict`,`pandas`,`torchfile`
 
 **Setup**
+
 1. git clone repo
 2. ./bootstrap.sh to download and preprocess all necessary data for the model to train.
 
 
-**Training** <br/>
+**Training**
+
 python ./StackGAN-v2/code/main.py  --h <br/>
 usage: main.py [-h] [--cfg CFG_FILE] [--gpu GPU_ID] [--data_dir DATA_DIR][--manualSeed MANUALSEED] <br/>
 
@@ -52,10 +55,12 @@ optional arguments:<br/>
 
 
 **Pretrained Model**
+
 - [StackGAN-v2 for bird](https://drive.google.com/open?id=1s5Yf3nFiXx0lltMFOiJWB6s1LP24RcwH). Download and save it to `models/` (The [inception score](https://github.com/hanzhanggit/StackGAN-inception-model) for this Model is 4.04±0.05)
 
 
 **Evaluating**
+
 - Run `python main.py --cfg cfg/eval_birds.yml --gpu 1` to generate samples from captions in birds validation set.
 - Change the `eval_*.yml` files to generate images from other pre-trained models. 
 
