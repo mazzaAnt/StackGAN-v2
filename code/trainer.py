@@ -427,6 +427,20 @@ class condGANTrainer(object):
             self.gradient_one = self.gradient_one.cuda()
             self.gradient_half = self.gradient_half.cuda()
             noise, fixed_noise = noise.cuda(), fixed_noise.cuda()
+            
+            
+        model_ = 'BEST_checkpoint_cub_5_cap_per_img_5_min_word_freq.pth.tar'
+
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        checkpoint = torch.load(model_)
+        decoder = checkpoint['decoder']
+        decoder = decoder.to(device)
+        decoder.eval()
+        encoder = checkpoint['encoder']
+        encoder = encoder.to(device)
+        encoder.eval()
+
+            
 
         predictions = []
         count = start_count
@@ -467,46 +481,20 @@ class condGANTrainer(object):
                 #######################################################
                 # (*) Forward fake images to SAT
                 ######################################################
-                from SATmodels import Encoder, DecoderWithAttention
                 from torch.nn.utils.rnn import pack_padded_sequence
 
                 fine_tune_encoder = False
-
-                # Read word map 
-                word_map_file = os.path.join(data_folder, 'WORDMAP_' + data_name + '.json') 
-                with open(word_map_file, 'r') as j:
-                    word_map = json.load(j)
-
-                # Define the encoder/decoder structure for SAT model
-                decoder = DecoderWithAttention(attention_dim=512,
-                                               embed_dim=512,
-                                               decoder_dim=512,
-                                               vocab_size=len(word_map),
-                                               dropout=0.5).cuda()
-                decoder_optimizer = torch.optim.Adam(params=filter(lambda p: p.requires_grad, decoder.parameters()),
-                                                     lr=4e-4)
-
-                encoder = Encoder().cuda()
-                encoder.fine_tune(fine_tune_encoder)
-                encoder_optimizer = torch.optim.Adam(params=filter(lambda p: p.requires_grad, encoder.parameters()),
-                                                     lr=1e-4) if fine_tune_encoder else None
 
                 SATloss = 0
 
                 # Compute the SAT loss after forwarding the SAT model
                 for idx in range(len(self.fake_imgs)):
                     img = encoder(self.fake_imgs[idx])
-                    scores, caps_sorted, decode_lengths, alphas, sort_ind = decoder(img, caps, caplens)
+                    scores, caps_sorted, decode_lengths, alphas, sort_ind = decoder(img, caps.cuda(), caplens.cuda())
                     targets = caps_sorted[:, 1:]
                     scores, _ = pack_padded_sequence(scores, decode_lengths, batch_first=True).cuda()
                     targets, _ = pack_padded_sequence(targets, decode_lengths, batch_first=True).cuda()
                     SATloss += self.SATcriterion(scores, targets) + 1 * ((1. - alphas.sum(dim=1)) ** 2).mean()
-
-
-                # Set zero_grad for encoder/decoder
-                decoder_optimizer.zero_grad()
-                if encoder_optimizer is not None:
-                    encoder_optimizer.zero_grad()
 
                 #######################################################
                 # (2) Update D network
@@ -527,14 +515,6 @@ class condGANTrainer(object):
                 errG_total += SATloss
                 errG_total.backward()
                 self.optimizerG.step()
-
-                #######################################################
-                # (*) Update SAT network:
-                ######################################################
-                # Update weights
-                decoder_optimizer.step()
-                if encoder_optimizer is not None:
-                    encoder_optimizer.step()
 
                 #######################################################
                 # (*) Prediction and Inception score:
